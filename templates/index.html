@@ -1,0 +1,21 @@
+
+    {% block main %}
+
+
+<div>
+    <div>Enter the URL:</div> 
+</div>
+
+<form action="/shorten" method="post">
+
+    <div class="form-group">
+        <input autocomplete="off" autofocus class="form-control" name="heater" placeholder="Http://" type="text">
+    </div>
+    
+    <button class="btn btn-primary " type="submit">Shorten</button>
+
+
+</form>
+
+
+{% endblock %}
