@@ -4,12 +4,15 @@ import sqlite3
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods = ["GET", "POST"])
 ## index page
 def index():
-    return render_template("/index.html")
+    if request.method == "POST":
+        pass
+    if request.method == "GET":
+        return render_template("/index.html")
 
 @app.route('/result')
 ## result page 
 def hello():
-    return 'Hello, World'
+    return render_template("/result.html")
