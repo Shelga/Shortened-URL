@@ -1,9 +1,29 @@
 from flask import Flask, render_template, redirect, request, url_for, jsonify
 import sqlite3
 import shortuuid
+import socketserver
 import socket
 
 app = Flask(__name__)
+
+
+
+    
+
+# original_socket_bind = socketserver.TCPServer.server_bind
+# def socket_bind_wrapper(self):
+#     ret = original_socket_bind(self)
+#     print("Socket running at {}:{}".format(*self.socket.getsockname()))
+#     # Recover original implementation
+#     socketserver.TCPServer.server_bind = original_socket_bind
+#     return ret
+
+# @app.route("/")
+# def hello():
+#     return 'Hello, world! running on {}'.format(request.Host)
+
+# socketserver.TCPServer.server_bind = socket_bind_wrapper   #Hook the wrapper
+# app.run(port=0, debug=True)
 
 
 @app.route('/', methods = ["POST"])
@@ -28,30 +48,31 @@ def get_url():
         cursor.execute("INSERT INTO url_shortner (url, hash) VALUES (?, ?)", (urlToSort, shotrUrl))
         connect.commit()
 
-        print(request.environ['SERVER_NAME'])
-
-        # jsonobj = jsonify({'short URL': shotrUrl})
-        # return jsonobj
-
-        return 'Hello, world! running on %s' % request.Host
         
-    if request.method == "GET":
-        ## get hash for url
-        # ...
-        return redirect(url_for('app.show_result', hash=hash))
+        varToJson = f"{request.root_url}/result/" + shotrUrl
+
+        jsonobj = jsonify({'short URL': varToJson})
+  
+        return jsonobj
 
 
 
-@app.route('/result/<hash>', methods = ["GET"])
-## result page 
-def show_result(hash):
-    pass
+
+
+@app.route('/result/<varToJson>', methods = ["GET"])
+def show_result(varToJson):
+    connect = sqlite3.connect("project.db")
+    cursor = connect.cursor()
+
+    longUrl= cursor.execute(f'SELECT url FROM url_shortner WHERE hash == {varToJson};')
+    print(longUrl)
+
+    return longUrl
 
 
 
-if __== '__main__':
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(('localhost', 0))
-    port = sock.getsockname()[1]
-    sock.close()
-    app.run(port=port)
+
+
+if __name__ == '__main__':
+    app.run()
+
