@@ -4,26 +4,10 @@ import shortuuid
 import socketserver
 import socket
 
+from urllib.parse import urlparse, urlunparse
+
 app = Flask(__name__)
 
-
-
-    
-
-# original_socket_bind = socketserver.TCPServer.server_bind
-# def socket_bind_wrapper(self):
-#     ret = original_socket_bind(self)
-#     print("Socket running at {}:{}".format(*self.socket.getsockname()))
-#     # Recover original implementation
-#     socketserver.TCPServer.server_bind = original_socket_bind
-#     return ret
-
-# @app.route("/")
-# def hello():
-#     return 'Hello, world! running on {}'.format(request.Host)
-
-# socketserver.TCPServer.server_bind = socket_bind_wrapper   #Hook the wrapper
-# app.run(port=0, debug=True)
 
 
 @app.route('/', methods = ["POST"])
@@ -50,6 +34,9 @@ def get_url():
 
         
         varToJson = f"{request.root_url}/result/" + shotrUrl
+        print("root_url", request.root_url)
+        print("urlToSort", urlToSort)
+        print("shotrUrl", shotrUrl)
 
         jsonobj = jsonify({'short URL': varToJson})
   
@@ -61,16 +48,26 @@ def get_url():
 
 @app.route('/result/<varToJson>', methods = ["GET"])
 def show_result(varToJson):
+    
+    varToJson = {varToJson}
+    print("varToJson", varToJson)
+
     connect = sqlite3.connect("project.db")
     cursor = connect.cursor()
 
-    longUrl= cursor.execute(f'SELECT url FROM url_shortner WHERE hash == {varToJson};')
-    print(longUrl)
+    longUrl= cursor.execute(f'SELECT url FROM url_shortner WHERE hash = "varToJson";')
+    longUrl = cursor.fetchall()
+  
+    print("longUrl", longUrl)
 
-    return longUrl
+
+    
+    return "Hello"
 
 
+   
 
+## Получить переменную varToJson 
 
 
 if __name__ == '__main__':
