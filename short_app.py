@@ -12,6 +12,7 @@ app = Flask(__name__)
 
 @app.route('/', methods = ["POST"])
 ## index page
+## done
 
 def get_url():
     if request.method == "POST":
@@ -49,25 +50,28 @@ def get_url():
 @app.route('/result/<varToJson>', methods = ["GET"])
 def show_result(varToJson):
     
-    varToJson = {varToJson}
+    varToJson = varToJson
     print("varToJson", varToJson)
 
     connect = sqlite3.connect("project.db")
     cursor = connect.cursor()
 
-    longUrl= cursor.execute(f'SELECT url FROM url_shortner WHERE hash = "varToJson";')
-    longUrl = cursor.fetchall()
-  
+    # longUrl= cursor.execute('SELECT url FROM url_shortner WHERE id = 50;')
+    longUrl= cursor.execute(f'SELECT * FROM url_shortner WHERE hash = ?', {varToJson})
+    longUrl = cursor.fetchone()
     print("longUrl", longUrl)
 
 
-    
     return "Hello"
+  
+  
 
 
-   
+    # return redirect(longUrl[0], 302)
 
-## Получить переменную varToJson 
+
+## get longUrl
+
 
 
 if __name__ == '__main__':
