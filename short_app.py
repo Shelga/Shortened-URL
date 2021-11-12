@@ -17,6 +17,7 @@ app = Flask(__name__)
 def get_url():
     if request.method == "POST":
         urlToSort = request.form.get("urlToSort")
+       
 
         shotrUrl = shortuuid.uuid(urlToSort)[:8]
 
@@ -40,6 +41,7 @@ def get_url():
         print("shotrUrl", shotrUrl)
 
         jsonobj = jsonify({'short URL': varToJson})
+        print("jsonobj", jsonobj)
   
         return jsonobj
 
@@ -50,24 +52,23 @@ def get_url():
 @app.route('/result/<varToJson>', methods = ["GET"])
 def show_result(varToJson):
     
-    varToJson = varToJson
+    varToJson = {varToJson}
     print("varToJson", varToJson)
 
     connect = sqlite3.connect("project.db")
     cursor = connect.cursor()
 
-    # longUrl= cursor.execute('SELECT url FROM url_shortner WHERE id = 50;')
-    longUrl= cursor.execute(f'SELECT * FROM url_shortner WHERE hash = ?', {varToJson})
-    longUrl = cursor.fetchone()
+    # longUrl= cursor.execute('SELECT url FROM url_shortner WHERE hash = "QBB2S5qm";')
+    longUrl= cursor.execute('SELECT url FROM url_shortner WHERE hash = ?', (varToJson,))
+
+    longUrl = cursor.fetchall()
     print("longUrl", longUrl)
 
 
-    return "Hello"
-  
+    # return "Hello"
   
 
-
-    # return redirect(longUrl[0], 302)
+    return redirect(longUrl[0], 302)
 
 
 ## get longUrl
