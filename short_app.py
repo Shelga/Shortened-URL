@@ -1,6 +1,8 @@
 from flask import Flask, redirect, request, jsonify
 import sqlite3
 import shortuuid
+import urllib.request
+import requests 
 
 
 app = Flask(__name__)
@@ -12,7 +14,14 @@ app = Flask(__name__)
 def get_url():
     if request.method == "POST":
         urlToSort = request.form.get("urlToSort")
-       
+        print("urlToSort", urlToSort)
+
+        # print("urllib", urllib.request.urlopen(urlToSort).getcode())
+
+        r = requests.get(urlToSort)
+        z = r.raise_for_status()
+        print("z", z)
+
         shotrUrl = shortuuid.uuid(urlToSort)[:8]
 
         connect = sqlite3.connect("project.db")
