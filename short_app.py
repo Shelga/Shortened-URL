@@ -1,29 +1,23 @@
 from flask import Flask, redirect, request, jsonify
 import sqlite3
-import shortuuid
-import urllib.request
+from hashfunction import get_hash
+
 import requests 
 
 
 app = Flask(__name__)
 
 
-
 @app.route('/', methods = ["POST"])
-## index page
 def get_url():
     if request.method == "POST":
+        ## Receive URL
         urlToSort = request.form.get("urlToSort")
-        print("urlToSort", urlToSort)
+       
+        ## Calling the hash function from the module
+        shotrUrl = get_hash(urlToSort)
 
-        # print("urllib", urllib.request.urlopen(urlToSort).getcode())
-
-        r = requests.get(urlToSort)
-        z = r.raise_for_status()
-        print("z", z)
-
-        shotrUrl = shortuuid.uuid(urlToSort)[:8]
-
+        ## Create taable and save long url and hash
         connect = sqlite3.connect("project.db")
         cursor = connect.cursor()
         cursor.execute("""CREATE TABLE IF NOT EXISTS url_shortner(
@@ -36,6 +30,7 @@ def get_url():
         cursor.execute("INSERT INTO url_shortner (url, hash) VALUES (?, ?)", (urlToSort, shotrUrl))
         connect.commit()
         
+        ## Create short URL 
         varToJson = f"{request.root_url}/result/" + shotrUrl
 
         jsonobj = jsonify({'short URL': varToJson})
@@ -43,28 +38,20 @@ def get_url():
         return jsonobj
 
 
-
-
-
 @app.route('/result/<varToJson>', methods = ["GET"])
 def show_result(varToJson):
     
+    ## Get hash from short URL 
     varToJson = varToJson
-    print("varToJson", varToJson)
 
     connect = sqlite3.connect("project.db")
     cursor = connect.cursor()
 
-    # longUrl= cursor.execute('SELECT url FROM url_shortner WHERE hash = "LKEWWrV5";')
     longUrl= cursor.execute('SELECT url FROM url_shortner WHERE hash = ?', (varToJson,))
 
     longUrl = cursor.fetchone()
-    print("longUrl", longUrl)
 
-
-    # return "Hello"
-  
-
+    ## Redirect to long URL
     return redirect(longUrl[0], 302)
 
 
