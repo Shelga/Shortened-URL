@@ -3,18 +3,13 @@ import sqlite3
 from hashfunction import get_hash
 import requests 
 
-
 app = Flask(__name__)
 
 
 @app.route('/', methods = ["POST"])
 def get_url():
     if request.method == "POST":
-        ## Receive URL
-        # urlToSort = request.form.get("urlToSort")
-
-        correct_url = False
-
+        # Receive URL
         urlToSort = request.form.get("urlToSort")
 
         try:
@@ -48,8 +43,6 @@ def get_url():
     
             return jsonobj
 
-  
-
 
 @app.route('/result/<varToJson>', methods = ["GET"])
 def show_result(varToJson):
@@ -63,8 +56,6 @@ def show_result(varToJson):
     longUrl= cursor.execute('SELECT url FROM url_shortner WHERE hash = ?', (varToJson,))
 
     longUrl = cursor.fetchone()
-
-
 
     ## Redirect to long URL
 
