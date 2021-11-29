@@ -5,7 +5,6 @@ import requests
 
 app = Flask(__name__)
 
-
 @app.route('/', methods = ["POST"])
 def get_url():
     if request.method == "POST":
