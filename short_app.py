@@ -1,5 +1,6 @@
 from flask import Flask, redirect, request, jsonify
 import sqlite3
+import os
 from hashfunction import get_hash
 import requests 
 
@@ -63,5 +64,8 @@ def show_result(varToJson):
 
 
 if __name__ == '__main__':
-    app.run()
+    print("APP IS STARTING")
+    print("_______________")
+    print(f"PORT IS: {os.environ['PORT']}")
+    app.run(host='0.0.0.0', port=int(os.environ['PORT']))
 
