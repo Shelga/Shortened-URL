@@ -3,8 +3,43 @@ import sqlite3
 import os
 from hashfunction import get_hash
 import requests 
+from dotenv import load_dotenv
+
+
+from flask_sqlalchemy import SQLAlchemy
+
+from flask_migrate import Migrate
+
+
+
 
 app = Flask(__name__)
+
+## take environment variables from .env.
+load_dotenv()
+key = os.getenv('KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = key
+
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+
+class UrlModel(db.Model):
+    __tablename__ = 'url_shortner'
+
+    id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String())
+    hash = db.Column(db.String())
+ 
+
+    def __init__(self, url, hash):
+        self.url = url
+        self.hash = hash
+
+    def __repr__(self):
+        return f""
+
+
 
 @app.route('/', methods = ["POST"])
 def get_url():
@@ -24,17 +59,10 @@ def get_url():
             shotrUrl = get_hash(urlToSort)
 
             ## Create taable and save long url and hash
-            connect = sqlite3.connect("project.db")
-            cursor = connect.cursor()
-            cursor.execute("""CREATE TABLE IF NOT EXISTS url_shortner(
-                id INTEGER PRIMARY KEY,
-                url TEXT,
-                hash TEXT 
-            )""")
-            connect.commit()
 
-            cursor.execute("INSERT INTO url_shortner (url, hash) VALUES (?, ?)", (urlToSort, shotrUrl))
-            connect.commit()
+            new_url = UrlModel(url=urlToSort, hash=shotrUrl)
+            db.session.add(new_url)
+            db.session.commit()
             
             ## Create short URL 
             varToJson = f"{request.root_url}/result/" + shotrUrl
@@ -60,6 +88,62 @@ def show_result(varToJson):
     ## Redirect to long URL
 
     return redirect(longUrl[0], 302)
+
+
+# @app.route('/', methods = ["POST"])
+# def get_url():
+#     if request.method == "POST":
+#         # Receive URL
+#         urlToSort = request.form.get("urlToSort")
+
+#         try:
+#             res = requests.get(urlToSort)
+#             correct_url = True
+#         except:
+#             return "Please enter a valid URL. Perhaps you miss http:// or https://"
+
+#         if correct_url:
+            
+#             ## Calling the hash function from the module
+#             shotrUrl = get_hash(urlToSort)
+
+#             ## Create taable and save long url and hash
+#             connect = sqlite3.connect("project.db")
+#             cursor = connect.cursor()
+#             cursor.execute("""CREATE TABLE IF NOT EXISTS url_shortner(
+#                 id INTEGER PRIMARY KEY,
+#                 url TEXT,
+#                 hash TEXT 
+#             )""")
+#             connect.commit()
+
+#             cursor.execute("INSERT INTO url_shortner (url, hash) VALUES (?, ?)", (urlToSort, shotrUrl))
+#             connect.commit()
+            
+#             ## Create short URL 
+#             varToJson = f"{request.root_url}/result/" + shotrUrl
+
+#             jsonobj = jsonify({'short URL': varToJson})
+    
+#             return jsonobj
+
+
+# @app.route('/result/<varToJson>', methods = ["GET"])
+# def show_result(varToJson):
+    
+#     ## Get hash from short URL 
+#     varToJson = varToJson
+
+#     connect = sqlite3.connect("project.db")
+#     cursor = connect.cursor()
+
+#     longUrl= cursor.execute('SELECT url FROM url_shortner WHERE hash = ?', (varToJson,))
+
+#     longUrl = cursor.fetchone()
+
+#     ## Redirect to long URL
+
+#     return redirect(longUrl[0], 302)
     
 
 
