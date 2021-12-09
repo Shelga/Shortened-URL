@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from flask import Flask, redirect, request, jsonify
 import sqlite3
 import os
@@ -6,38 +8,37 @@ import requests
 from dotenv import load_dotenv
 
 
+
 from flask_sqlalchemy import SQLAlchemy
 
 from flask_migrate import Migrate
-
-
 
 
 app = Flask(__name__)
 
 ## take environment variables from .env.
 load_dotenv()
-key = os.getenv('KEY')
+key = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_DATABASE_URI'] = key
-
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
 migrate = Migrate(app, db)
 
-
-class UrlModel(db.Model):
+class Urls(db.Model):
     __tablename__ = 'url_shortner'
-
     id = db.Column(db.Integer, primary_key=True)
-    url = db.Column(db.String())
-    hash = db.Column(db.String())
+    url = db.Column(db.String(120), unique=True, nullable=False)
+    hash = db.Column(db.String(120), unique=True, nullable=False)
  
-
     def __init__(self, url, hash):
         self.url = url
         self.hash = hash
 
     def __repr__(self):
-        return f""
+        return self.url
+
+db.create_all()
 
 
 
@@ -60,7 +61,7 @@ def get_url():
 
             ## Create taable and save long url and hash
 
-            new_url = UrlModel(url=urlToSort, hash=shotrUrl)
+            new_url = Urls(url=urlToSort, hash=shotrUrl)
             db.session.add(new_url)
             db.session.commit()
             
@@ -68,6 +69,8 @@ def get_url():
             varToJson = f"{request.root_url}/result/" + shotrUrl
 
             jsonobj = jsonify({'short URL': varToJson})
+
+            print("_______here_________")
     
             return jsonobj
 
@@ -77,17 +80,19 @@ def show_result(varToJson):
     
     ## Get hash from short URL 
     varToJson = varToJson
+    print("varToJson", varToJson)
+    print("_______there_________")
 
-    connect = sqlite3.connect("project.db")
-    cursor = connect.cursor()
+    Urls.query.all()
+    longUrl = Urls.query.filter_by(hash=varToJson).all()
 
-    longUrl= cursor.execute('SELECT url FROM url_shortner WHERE hash = ?', (varToJson,))
-
-    longUrl = cursor.fetchone()
+    # longUrl = session.query(Urls).filter(Urls.hash == "varToJson")
+    print("longUrl", longUrl[0], type(longUrl[0]))
 
     ## Redirect to long URL
 
-    return redirect(longUrl[0], 302)
+
+    return redirect(str(longUrl[0]), 302)
 
 
 # @app.route('/', methods = ["POST"])
