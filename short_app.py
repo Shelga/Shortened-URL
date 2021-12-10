@@ -7,12 +7,9 @@ from hashfunction import get_hash
 import requests 
 from dotenv import load_dotenv
 
-
-
 from flask_sqlalchemy import SQLAlchemy
 
 from flask_migrate import Migrate
-
 
 app = Flask(__name__)
 
@@ -40,8 +37,6 @@ class Urls(db.Model):
 
 db.create_all()
 
-
-
 @app.route('/', methods = ["POST"])
 def get_url():
     if request.method == "POST":
@@ -60,7 +55,6 @@ def get_url():
             shotrUrl = get_hash(urlToSort)
 
             ## Create taable and save long url and hash
-
             new_url = Urls(url=urlToSort, hash=shotrUrl)
             db.session.add(new_url)
             db.session.commit()
@@ -69,8 +63,6 @@ def get_url():
             varToJson = f"{request.root_url}/result/" + shotrUrl
 
             jsonobj = jsonify({'short URL': varToJson})
-
-            print("_______here_________")
     
             return jsonobj
 
@@ -80,18 +72,11 @@ def show_result(varToJson):
     
     ## Get hash from short URL 
     varToJson = varToJson
-    print("varToJson", varToJson)
-    print("_______there_________")
 
     Urls.query.all()
     longUrl = Urls.query.filter_by(hash=varToJson).all()
 
-    # longUrl = session.query(Urls).filter(Urls.hash == "varToJson")
-    print("longUrl", longUrl[0], type(longUrl[0]))
-
     ## Redirect to long URL
-
-
     return redirect(str(longUrl[0]), 302)
 
 
