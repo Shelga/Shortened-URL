@@ -11,12 +11,22 @@ from flask_sqlalchemy import SQLAlchemy
 
 from flask_migrate import Migrate
 
+import os
+import re
+
+uri = os.getenv("DATABASE_URL")  # or other relevant config var
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+# rest of connection code using the connection string `uri`
+
 app = Flask(__name__)
 
 ## take environment variables from .env.
 load_dotenv()
-key = os.getenv('DATABASE_URL1')
-app.config['SQLALCHEMY_DATABASE_URI1'] = key
+uri = os.getenv('DATABASE_URL')
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
