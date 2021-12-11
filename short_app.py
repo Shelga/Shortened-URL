@@ -15,8 +15,8 @@ app = Flask(__name__)
 
 ## take environment variables from .env.
 load_dotenv()
-key = os.getenv('DATABASE_URL')
-app.config['SQLALCHEMY_DATABASE_URI'] = key
+key = os.getenv('DATABASE_URL1')
+app.config['SQLALCHEMY_DATABASE_URI1'] = key
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
