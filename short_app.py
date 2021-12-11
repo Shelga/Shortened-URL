@@ -140,6 +140,6 @@ def show_result(varToJson):
 if __name__ == '__main__':
     print("APP IS STARTING")
     print("_______________")
-    print(f"PORT IS: {os.environ['PORT']}")
-    app.run(host='0.0.0.0', port=int(os.environ['PORT']))
+    print(f"PORT IS: {os.environ['SHORT_URL_PORT']}")
+    app.run(host='0.0.0.0', port=int(os.environ['SHORT_URL_PORT']))
 
